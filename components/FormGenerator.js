@@ -1,6 +1,7 @@
 function FormGenerator({ selectedModule, onGenerate, onReset, isLoading }) {
     try {
         const [formData, setFormData] = React.useState({});
+        const firstInputRef = React.useRef(null);
 
         const handleInputChange = (field, value) => {
             setFormData(prev => ({ ...prev, [field]: value }));
@@ -18,6 +19,12 @@ function FormGenerator({ selectedModule, onGenerate, onReset, isLoading }) {
 
         React.useEffect(() => {
             setFormData({});
+            // Auto-focus on first input when module changes
+            if (selectedModule && firstInputRef.current) {
+                setTimeout(() => {
+                    firstInputRef.current.focus();
+                }, 100);
+            }
         }, [selectedModule]);
 
         if (!selectedModule) {
@@ -52,6 +59,7 @@ function FormGenerator({ selectedModule, onGenerate, onReset, isLoading }) {
                             </label>
                             {field.type === 'textarea' ? (
                                 <textarea
+                                    ref={index === 0 ? firstInputRef : null}
                                     className="cosmic-input w-full p-3 rounded-lg"
                                     rows="3"
                                     placeholder={field.placeholder}
@@ -60,6 +68,7 @@ function FormGenerator({ selectedModule, onGenerate, onReset, isLoading }) {
                                 />
                             ) : (
                                 <input
+                                    ref={index === 0 ? firstInputRef : null}
                                     type="text"
                                     className="cosmic-input w-full p-3 rounded-lg"
                                     placeholder={field.placeholder}
