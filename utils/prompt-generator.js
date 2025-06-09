@@ -51,140 +51,46 @@ const promptTemplates = {
 - Historias con behind the scenes
 - Lives de Q&A semanales`,
 
-    'customer-journey': (data) => `# MAPA DEL CUSTOMER JOURNEY
+    'customer-journey': (data) => `# MAPA DEL CUSTOMER JOURNEY COMPLETO
 
-## 🎯 ETAPAS DEL RECORRIDO DEL CLIENTE
+## 🎯 INFORMACIÓN DEL PROYECTO
+${Object.entries(data).map(([key, value]) => `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || 'No especificado'}`).join('\n')}
 
-### 1. CONCIENCIA (Awareness)
-**Situación:** ${data.awareness || 'El cliente identifica un problema o necesidad'}
+## 📊 ETAPAS DEL RECORRIDO
+### 1. CONCIENCIA → 2. CONSIDERACIÓN → 3. DECISIÓN → 4. COMPRA → 5. RETENCIÓN
 
-**Touchpoints:**
-- Redes sociales (contenido orgánico)
-- Búsquedas en Google
-- Recomendaciones de amigos
-- Publicidad en Facebook/Instagram
+**Métricas clave:** CTR, CPM, Conversiones, LTV, NPS`
+};
 
-**Contenido necesario:**
-- Posts educativos sobre el problema
-- Videos explicativos
-- Infografías con estadísticas
-- Testimonios de clientes
-
-### 2. CONSIDERACIÓN (Consideration)
-**Situación:** ${data.consideration || 'El cliente evalúa diferentes opciones y soluciones'}
-
-**Touchpoints:**
-- Website y blog
-- Webinars gratuitos
-- Lead magnets
-- Email marketing
-- Redes sociales
-
-**Contenido necesario:**
-- Comparativas de soluciones
-- Casos de estudio detallados
-- Demos y pruebas gratuitas
-- FAQ y objeciones comunes
-
-### 3. DECISIÓN (Decision)
-**Touchpoints:**
-- Página de ventas
-- Llamadas de consultoría
-- Chat en vivo
-- Email de seguimiento
-
-**Contenido necesario:**
-- Propuestas personalizadas
-- Garantías y testimonios
-- Urgencia y escasez
-- Bonos y descuentos
-
-### 4. COMPRA (Purchase)
-**Experiencia:**
-- Proceso de pago simple
-- Confirmación inmediata
-- Bienvenida personalizada
-- Acceso rápido al producto
-
-### 5. POST-COMPRA (Post-Purchase)
-**Objetivos:**
-- Onboarding efectivo
-- Soporte continuo
-- Upsells y cross-sells
-- Referidos y testimonios
-
-## 📊 MÉTRICAS POR ETAPA
-- **Conciencia:** Reach, impresiones, tráfico web
-- **Consideración:** Leads generados, engagement
-- **Decisión:** Tasa de conversión, valor promedio
-- **Compra:** Abandono de carrito, tiempo de proceso
-- **Post-compra:** NPS, LTV, tasa de referidos`,
-
-    'default': (moduleKey, data) => `# PROMPT PROFESIONAL PARA ${moduleKey.toUpperCase()}
+const createPrompt = (moduleKey, formData) => {
+    // Check if we have a specific template for this module
+    if (promptTemplates[moduleKey]) {
+        return promptTemplates[moduleKey](formData);
+    }
+    
+    // Default template for modules without specific templates
+    return `# PROMPT PROFESIONAL PARA ${moduleKey.toUpperCase()}
 
 ## 📋 INFORMACIÓN PROPORCIONADA
-${Object.entries(data).map(([key, value]) => `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value}`).join('\n')}
+${Object.entries(formData).map(([key, value]) => `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || 'No especificado'}`).join('\n')}
 
-## 🎯 PROMPT ESTRUCTURADO
-
-Actúa como un experto consultor en marketing digital especializado en ${moduleKey}.
-
-**CONTEXTO:**
-Trabajas con un negocio que necesita desarrollar estrategias específicas para ${moduleKey}. Tu experiencia incluye más de 10 años en marketing digital, growth hacking y optimización de conversiones.
-
-**TAREA:**
-Basándote en la información proporcionada, desarrolla un plan detallado que incluya:
+## 🎯 ESTRATEGIA RECOMENDADA
 
 ### 1. ANÁLISIS SITUACIONAL
 - Evaluación del estado actual
 - Identificación de oportunidades
 - Análisis de la competencia
-- Fortalezas y debilidades
 
-### 2. ESTRATEGIA ESPECÍFICA
+### 2. PLAN DE ACCIÓN
 - Objetivos SMART claros
-- Tácticas recomendadas
-- Canales prioritarios
-- Presupuesto sugerido
+- Tácticas específicas
+- Cronograma de implementación
 
-### 3. PLAN DE IMPLEMENTACIÓN
-- Cronograma de 90 días
-- Recursos necesarios
-- Responsabilidades
-- Hitos importantes
-
-### 4. MÉTRICAS Y KPIs
-- Indicadores de rendimiento
+### 3. MÉTRICAS Y SEGUIMIENTO
+- KPIs principales
 - Herramientas de medición
-- Frecuencia de reportes
-- Benchmarks de la industria
+- Reportes periódicos
 
-### 5. RECOMENDACIONES ADICIONALES
-- Mejores prácticas
-- Errores comunes a evitar
-- Recursos complementarios
-- Siguientes pasos
-
-**FORMATO:**
-Presenta toda la información de manera estructurada, actionable y fácil de implementar. Incluye ejemplos específicos y casos prácticos cuando sea relevante.`
-};
-
-const createPrompt = async (moduleKey, formData) => {
-    try {
-        // Try AI agent first if available
-        if (typeof invokeAIAgent === 'function') {
-            const systemPrompt = `Actúa como un experto en marketing digital especializado en ${moduleKey}. Genera un prompt estructurado y detallado con estrategias específicas y actionables.`;
-            const userPrompt = `Información del cliente: ${JSON.stringify(formData)}. Genera un prompt completo y profesional.`;
-            const aiResult = await invokeAIAgent(systemPrompt, userPrompt);
-            if (aiResult && aiResult.length > 200) {
-                return aiResult;
-            }
-        }
-    } catch (error) {
-        console.error('AI Agent not available:', error);
-    }
-
-    // Use detailed templates as fallback
-    const template = promptTemplates[moduleKey] || promptTemplates.default;
-    return template(formData, moduleKey);
+**PRÓXIMOS PASOS:**
+Implementar las estrategias sugeridas de manera gradual y medir resultados constantemente.`;
 };
